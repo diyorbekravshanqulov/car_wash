@@ -21,15 +21,15 @@ async function start() {
       .addTag('NestJS, Nodejs, Postgres, Bot, SMS, Sequezlize, Swagger, Mailer')
       .build();
 
+    // Set global prefix for API routes
+    app.setGlobalPrefix('api');
+
     // Generate Swagger documentation
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('docs', app, document);
 
     // Use cookie parser middleware
     app.use(cookieParser());
-
-    // Set global prefix for API routes
-    app.setGlobalPrefix('api');
 
     // Apply global validation pipe for input validation
     app.useGlobalPipes(new ValidationPipe());
