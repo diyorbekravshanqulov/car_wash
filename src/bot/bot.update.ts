@@ -24,7 +24,12 @@ export class BotUpdate {
   async onContact(@Ctx() ctx: Context) {
     if ('contact' in ctx.message) {
       console.log(ctx.message.contact);
-      await this.botService.onContact(ctx)
+      await this.botService.onContact(ctx);
     }
+  }
+
+  @Command('stop')
+  async onStop(@Ctx() ctx: Context) {
+    await this.botService.onStop(ctx);
   }
 }

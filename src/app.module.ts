@@ -6,6 +6,10 @@ import { TelegrafModule } from 'nestjs-telegraf';
 import { BOT_NAME } from './app.constants';
 import { BotModule } from './bot/bot.module';
 import { Bot } from './bot/model/bot.model';
+import { UsersModule } from './users/users.module';
+import { Users } from './users/model/user.model';
+import { Otp } from './otp/model/otp.model';
+import { OtpModule } from './otp/otp.module';
 
 @Module({
   imports: [
@@ -28,13 +32,15 @@ import { Bot } from './bot/model/bot.model';
       username: process.env.POSTGRES_USER, // Getting username from environment variables
       password: process.env.POSTGRES_PASSWORD, // Getting password from environment variables
       database: process.env.POSTGRES_DB, // Getting database name from environment variables
-      models: [Bot], // Associating Sequelize models with the database
+      models: [Bot, Users, Otp], // Associating Sequelize models with the database
       autoLoadModels: true, // Automatically loading models from the specified paths
       sync: { alter: true }, // Synchronizing database schema with model definitions (altering tables)
       logging: true, // Enabling logging for database operations
     }),
 
     BotModule,
+    UsersModule,
+    OtpModule,
   ],
   controllers: [], // No controllers defined in this module
   providers: [], // No providers defined in this module

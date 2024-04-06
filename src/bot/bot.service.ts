@@ -89,4 +89,50 @@ export class BotService {
       }
     }
   }
+
+  async onStop(ctx: Context) {
+    const userId = ctx.from.id;
+    const user = await this.botRepo.findOne({ where: { user_Id: userId } });
+    if (!user) {
+      await ctx.reply(
+        `before You don't registrted, <b>"Send phone number"</b> point button`,
+        {
+          parse_mode: 'HTML',
+          ...Markup.keyboard([
+            Markup.button.contactRequest('📞 Send me your phone number'),
+          ])
+            .oneTime()
+            .resize(),
+        },
+      );
+    } else if (user.status) {
+      await this.botRepo.update(
+        {
+          status: false,
+          phone_number: null,
+        },
+        { where: { user_Id: userId } },
+      );
+      await ctx.reply(
+        `You logged out from bot. If you wan't registered again, Point <b>"/start"</b> button`,
+        {
+          parse_mode: 'HTML',
+        },
+      );
+    }
+  }
+  async sendOtp(phoneNumber: string, OTP: string): Promise<boolean> {
+    const user = await this.botRepo.findOne({
+      where: { phone_number: phoneNumber },
+    });
+    if (!user || !user.status) {
+      return false;
+    }
+    await this.bot.telegram.sendChatAction(user.user_Id, 'typing');
+    await this.bot.telegram.sendMessage(
+      user.user_Id,
+      'Verification code: ' + OTP,
+    );
+    return true;
+  }
 }
