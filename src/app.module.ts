@@ -32,7 +32,7 @@ import { OtpModule } from './otp/otp.module';
       username: process.env.POSTGRES_USER, // Getting username from environment variables
       password: process.env.POSTGRES_PASSWORD, // Getting password from environment variables
       database: process.env.POSTGRES_DB, // Getting database name from environment variables
-      models: [Bot, Users, Otp], // Associating Sequelize models with the database
+      models: [Bot, Users], // Associating Sequelize models with the database
       autoLoadModels: true, // Automatically loading models from the specified paths
       sync: { alter: true }, // Synchronizing database schema with model definitions (altering tables)
       logging: true, // Enabling logging for database operations
@@ -40,7 +40,7 @@ import { OtpModule } from './otp/otp.module';
 
     BotModule,
     UsersModule,
-    OtpModule,
+    // OtpModule,
   ],
   controllers: [], // No controllers defined in this module
   providers: [], // No providers defined in this module

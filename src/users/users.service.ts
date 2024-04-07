@@ -31,7 +31,7 @@ export class UsersService {
     @InjectModel(Otp) private readonly otpRepo: typeof Otp,
     private readonly jwtService: JwtService, // Injecting the JwtService for token generation
     private readonly mailService: MailService,
-    private readonly botService: BotService,
+    // private readonly botService: BotService,
   ) {}
 
   // Method to generate access and refresh tokens for a given user
@@ -299,92 +299,92 @@ export class UsersService {
     return users;
   }
 
-  async newOTP(phoneUserDto: PhoneUserDto) {
-    const phone_number = phoneUserDto.phone;
+  // async newOTP(phoneUserDto: PhoneUserDto) {
+  //   const phone_number = phoneUserDto.phone;
 
-    const otp = otpGenerator.generate(4, {
-      upperCaseAlphabets: false,
-      lowerCaseAlphabets: false,
-      specialChars: false,
-    });
+  //   const otp = otpGenerator.generate(4, {
+  //     upperCaseAlphabets: false,
+  //     lowerCaseAlphabets: false,
+  //     specialChars: false,
+  //   });
 
-    const isSend = await this.botService.sendOtp(phone_number, otp);
-    if (!isSend) {
-      throw new BadRequestException('Before You have to register from bot');
-    }
-    const now = new Date();
-    const expiration_time = AddMinutesToDate(now, 5);
+  //   const isSend = await this.botService.sendOtp(phone_number, otp);
+  //   if (!isSend) {
+  //     throw new BadRequestException('Before You have to register from bot');
+  //   }
+  //   const now = new Date();
+  //   const expiration_time = AddMinutesToDate(now, 5);
 
-    await this.otpRepo.destroy({
-      where: { check: phone_number },
-    });
+  //   await this.otpRepo.destroy({ 
+  //     where: { check: phone_number },
+  //   });
 
-    const newOtp = await this.otpRepo.create({
-      id: v4(),
-      otp,
-      expiration_time,
-      check: phone_number,
-    });
+  //   const newOtp = await this.otpRepo.create({
+  //     id: v4(),
+  //     otp,
+  //     expiration_time,
+  //     check: phone_number,
+  //   });
 
-    const details = {
-      timestamp: now,
-      check: phone_number,
-      otp_id: newOtp.id,
-    };
+  //   const details = {
+  //     timestamp: now,
+  //     check: phone_number,
+  //     otp_id: newOtp.id,
+  //   };
 
-    const encoded = await encode(JSON.stringify(details));
-    return { status: 'Success', details: encoded };
-  }
+  //   const encoded = await encode(JSON.stringify(details));
+  //   return { status: 'Success', details: encoded };
+  // }
 
-  async verifyOtp(verifyOtpDto: VerifyOtpDto) {
-    const { verification_key, otp, check } = verifyOtpDto;
-    const currentDate = new Date();
-    const decoded = await decode(verification_key);
-    const details = JSON.parse(decoded);
-    if (details.check != check) {
-      throw new BadRequestException("Otp don't send this phone number");
-    }
-    const resultOtp = await this.otpRepo.findOne({
-      where: { id: details.otp_id },
-    });
+  // async verifyOtp(verifyOtpDto: VerifyOtpDto) {
+  //   const { verification_key, otp, check } = verifyOtpDto;
+  //   const currentDate = new Date();
+  //   const decoded = await decode(verification_key);
+  //   const details = JSON.parse(decoded);
+  //   if (details.check != check) {
+  //     throw new BadRequestException("Otp don't send this phone number");
+  //   }
+  //   const resultOtp = await this.otpRepo.findOne({
+  //     where: { id: details.otp_id },
+  //   });
 
-    if (resultOtp == null) {
-      throw new BadRequestException('Not found this like OTP');
-    }
-    if (resultOtp.varified) {
-      throw new BadRequestException('OTP already have checked');
-    }
-    if (!dates.compare(resultOtp.expiration_time, currentDate)) {
-      throw new BadRequestException('OTP expired');
-    }
-    if (otp !== resultOtp.otp) {
-      throw new BadRequestException("OTP don't match");
-    }
+  //   if (resultOtp == null) {
+  //     throw new BadRequestException('Not found this like OTP');
+  //   }
+  //   if (resultOtp.varified) {
+  //     throw new BadRequestException('OTP already have checked');
+  //   }
+  //   if (!dates.compare(resultOtp.expiration_time, currentDate)) {
+  //     throw new BadRequestException('OTP expired');
+  //   }
+  //   if (otp !== resultOtp.otp) {
+  //     throw new BadRequestException("OTP don't match");
+  //   }
 
-    const user = await this.userRepo.update(
-      {
-        isOwner: true,
-      },
-      {
-        where: { phone: check },
-        returning: true,
-      },
-    );
-    if (!user[1][0]) {
-      throw new BadRequestException('Not found user');
-    }
+  //   const user = await this.userRepo.update(
+  //     {
+  //       isOwner: true,
+  //     },
+  //     {
+  //       where: { phone: check },
+  //       returning: true,
+  //     },
+  //   );
+  //   if (!user[1][0]) {
+  //     throw new BadRequestException('Not found user');
+  //   }
 
-    await this.otpRepo.update(
-      { varified: true },
-      { where: { id: details.otp_id } },
-    );
+  //   await this.otpRepo.update(
+  //     { varified: true },
+  //     { where: { id: details.otp_id } },
+  //   );
 
-    const response = {
-      message: 'You became owner',
-      user: user[1][0],
-    };
-    return response;
-  }
+  //   const response = {
+  //     message: 'You became owner',
+  //     user: user[1][0],
+  //   };
+  //   return response;
+  // }
 
   // Method to find all users
   async findAll() {

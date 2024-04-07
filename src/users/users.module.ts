@@ -13,17 +13,18 @@ import { OtpModule } from '../otp/otp.module';
 @Module({
   imports: [
     // Imports SequelizeModule to provide Sequelize functionality and register the 'Users' model
-    SequelizeModule.forFeature([Users, Bot, Otp]),
+    SequelizeModule.forFeature([Users, Otp]),
     // Imports JwtModule to provide JWT functionality for user authentication
     JwtModule.register({}),
     // Imports MailModule to provide MailModule for send email
     MailModule,
-    BotModule,
+    // BotModule,
     OtpModule,
   ],
   // Declares UsersController to define HTTP endpoints related to user management
   controllers: [UsersController],
   // Declares UsersService to provide business logic for user-related operations
   providers: [UsersService],
+  exports: [UsersService],
 })
 export class UsersModule {} // Exports UsersModule class as a feature module for user management

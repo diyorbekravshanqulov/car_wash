@@ -96,17 +96,17 @@ export class UsersController {
     return this.usersService.findOne(+id); // Calls the findOne method from the service
   }
 
-  @HttpCode(200)
-  @Post('new_otp')
-  async newOtp(@Body() phoneUserDto: PhoneUserDto) {
-    return this.usersService.newOTP(phoneUserDto);
-  }
+  // @HttpCode(200)
+  // @Post('new_otp')
+  // async newOtp(@Body() phoneUserDto: PhoneUserDto) {
+  //   return this.usersService.newOTP(phoneUserDto);
+  // }
 
-  @HttpCode(200)
-  @Post('verify_otp')
-  async verifyOtp(@Body() verifyOtpDto: VerifyOtpDto) {
-    return this.usersService.verifyOtp(verifyOtpDto);
-  }
+  // @HttpCode(200)
+  // @Post('verify_otp')
+  // async verifyOtp(@Body() verifyOtpDto: VerifyOtpDto) {
+  //   return this.usersService.verifyOtp(verifyOtpDto);
+  // }
 
   // Endpoint for updating a user by ID
   @Patch(':id') // Defines HTTP PATCH method and endpoint route with a parameter

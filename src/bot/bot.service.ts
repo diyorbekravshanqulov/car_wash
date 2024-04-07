@@ -7,132 +7,153 @@ import { InjectBot } from 'nestjs-telegraf';
 import { BOT_NAME } from '../app.constants';
 import { Context, Markup, Telegraf } from 'telegraf';
 import { truncate } from 'fs';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class BotService {
+  private step: any;
+  private step1: any;
+  private user: any;
+  private car: any;
   constructor(
     @InjectModel(Bot) private botRepo: typeof Bot,
     @InjectBot(BOT_NAME) private readonly bot: Telegraf<Context>,
-  ) {}
+    private readonly users: UsersService,
+  ) {
+    this.step = 0;
+    this.step1 = 0;
+    this.user = {};
+    this.car = {};
+  }
 
   async start(ctx: Context) {
-    const userId = ctx.from.id;
-    const user = await this.botRepo.findOne({ where: { user_Id: userId } });
-    if (!user) {
-      await this.botRepo.create({
-        user_Id: userId,
-        username: ctx.from.username,
-        first_name: ctx.from.first_name,
-        last_name: ctx.from.last_name,
-      });
-      await ctx.reply(`Please, <b>"Send phone number"</b> point button`, {
-        parse_mode: 'HTML',
-        ...Markup.keyboard([
-          Markup.button.contactRequest('📞 Send me your phone number'),
-        ])
-          .oneTime()
-          .resize(),
-      });
-    } else if (!user.status) {
-      await ctx.reply(`Please, <b>"Send phone number"</b> point button`, {
-        parse_mode: 'HTML',
-        ...Markup.keyboard([
-          Markup.button.contactRequest('📞 Send me your phone number'),
-        ])
-          .oneTime()
-          .resize(),
-      });
-    } else {
-      await ctx.reply(`With this bot you contact stadium program `, {
-        parse_mode: 'HTML',
-        ...Markup.removeKeyboard(),
-      });
-    }
+    this.step = 0;
+    this.step1 = 0;
+    await ctx.reply(
+      'Assalomu alaykum  ' +
+        ctx.message.from.first_name +
+        '\n' +
+        "Avtomobil yuvish uchun ro'yxatdan o'tish uchun ekranning pastki qismidagi (Ro'yxatdan o'tish) tugmasini bosing.",
+      {
+        reply_markup: {
+          keyboard: [
+            [
+              { text: "Ro'yxatdan o'tish" },
+              { text: "Biz haqimizda ma'lumotlar" },
+            ],
+            [
+              { text: 'Bizning manzil 📍' },
+              { text: "Biz bilan bog'lanish 📲" },
+            ],
+          ],
+          resize_keyboard: true,
+        },
+      },
+    );
   }
 
-  async onContact(ctx: Context) {
-    if ('contact' in ctx.message) {
-      const userId = ctx.from.id;
-      const user = await this.botRepo.findOne({
-        where: { user_Id: userId },
-      });
-      if (!user) {
-        await ctx.reply(`Please, <b>"/start"</b> point button`, {
-          parse_mode: 'HTML',
-          ...Markup.keyboard([['/start']])
-            .oneTime()
-            .resize(),
-        });
-      } else if (ctx.message.contact.user_id != userId) {
-        await ctx.reply(`Please, <b>"Send your own contact"</b> point button`, {
-          parse_mode: 'HTML',
-          ...Markup.keyboard([
-            Markup.button.contactRequest('📞 Send me your phone number'),
-          ])
-            .oneTime()
-            .resize(),
-        });
-      } else {
-        await this.botRepo.update(
-          {
-            phone_number: ctx.message.contact.phone_number,
-            status: true,
-          },
-          {
-            where: { user_Id: userId },
-          },
-        );
-        await ctx.reply(`Congretulation, You have registrated`, {
-          parse_mode: 'HTML',
-          ...Markup.removeKeyboard(),
+  async onMessage(ctx: Context) {
+    if ('text' in ctx.message) {
+      if (ctx.message.text == 'Bizning manzil 📍') {
+        await ctx.sendLocation(35.804819, 51.43407, {
+          live_period: 86400,
         });
       }
-    }
-  }
 
-  async onStop(ctx: Context) {
-    const userId = ctx.from.id;
-    const user = await this.botRepo.findOne({ where: { user_Id: userId } });
-    if (!user) {
-      await ctx.reply(
-        `before You don't registrted, <b>"Send phone number"</b> point button`,
-        {
-          parse_mode: 'HTML',
-          ...Markup.keyboard([
-            Markup.button.contactRequest('📞 Send me your phone number'),
-          ])
-            .oneTime()
-            .resize(),
-        },
-      );
-    } else if (user.status) {
-      await this.botRepo.update(
-        {
-          status: false,
-          phone_number: null,
-        },
-        { where: { user_Id: userId } },
-      );
-      await ctx.reply(
-        `You logged out from bot. If you wan't registered again, Point <b>"/start"</b> button`,
-        {
-          parse_mode: 'HTML',
-        },
-      );
+      if (this.step == 0) {
+        if (ctx.message.text == "Biz bilan bog'lanish 📲") {
+          this.user.id = ctx.message.from.id;
+          // Foydalanuvchidan ismini so'raymiz
+          this.step = ++this.step; // keyingi qadamga o'tish
+          await ctx.reply('Ismingizni kiritining', {
+            reply_markup: {
+              keyboard: [[{ text: 'Ortga qaytish' }]],
+              resize_keyboard: true,
+            },
+          });
+        }
+      } else if (this.step == 1 && this.user.id == ctx.message.from.id) {
+        // Foydalanuvchi ismini saqlash
+        this.user.name = ctx.message.text;
+
+        this.step = ++this.step; // boshqaga o'tish
+        await ctx.reply(`Yoshingizdi kiritining`, {
+          reply_markup: {
+            keyboard: [[{ text: 'Ortga qaytish' }]],
+            resize_keyboard: true,
+          },
+        });
+      } else if (this.step == 2 && this.user.id == ctx.message.from.id) {
+        // Foydalanuvchi ismini saqlash
+        this.user.age = ctx.message.text;
+        this.step = ++this.step; // boshqaga o'tish
+        await ctx.reply(`Mashena nomi`, {
+          reply_markup: {
+            keyboard: [[{ text: 'Ortga qaytish' }]],
+            resize_keyboard: true,
+          },
+        });
+      } else if (this.step == 3 && this.user.id == ctx.message.from.id) {
+        // Foydalanuvchi ismini saqlash
+        this.user.car_name = ctx.message.text;
+
+        await ctx.reply(
+          `id:${this.user.id}
+          Name:${this.user.name},
+          Age:${this.user.age},
+          Mashena:${this.user.car_name} `,
+        );
+      }
+
+      if (ctx.message.text == "Biz haqimizda ma'lumotlar") {
+        await ctx.reply(
+          'Avtomobillarga xizmat ko’rsatish har doim daromadli xizmat ko’rsatish sohalaridan biri bo’lib kelmoqda. Ayniqsa har bir avtomobil egasi o’z mashinasiga o’zi xizmat ko’rsatsa bu ajoyib imkoniyatdan boshqa narsa emas.',
+        );
+      }
+
+      if (ctx.message.text == "Ro'yxatdan o'tish") {
+        await ctx.reply('Mashinagizdi turini aytining', {
+          reply_markup: {
+            keyboard: [[{ text: 'Yengil mashina' }, { text: 'Yuk mashinasi' }]],
+            resize_keyboard: true,
+          },
+        });
+      }
+
+      if (this.step1 == 0) {
+        if (ctx.message.text == 'Yengil mashina') {
+          console.log(ctx, 'Yengil mashina');
+
+          this.car.id = ctx.message.from.id;
+          this.step1 = ++this.step1;
+          await ctx.reply('Mashena name', {
+            reply_markup: {
+              keyboard: [[{ text: 'Ortga qaytish' }]],
+              resize_keyboard: true,
+            },
+          });
+        }
+      } else if (this.step1 == 1 && this.car.id == ctx.message.from.id) {
+        this.car.name = ctx.message.text;
+        this.step1 = ++this.step1;
+        await ctx.reply(`Qanday yuvish kerek`, {
+          reply_markup: {
+            keyboard: [[{ text: 'Ortga qaytish' }]],
+            resize_keyboard: true,
+          },
+        });
+      } else if (this.car.id == ctx.message.from.id) {
+        console.log(ctx.message.text);
+
+        this.car.yuvish = ctx.message.text;
+        this.step1 = ++this.step1;
+        await ctx.reply(
+          `id:${this.car.id}
+          :${this.car.name},
+          :${this.car.yuvish},
+         `,
+        );
+      }
     }
-  }
-  async sendOtp(phoneNumber: string, OTP: string): Promise<boolean> {
-    const user = await this.botRepo.findOne({
-      where: { phone_number: phoneNumber },
-    });
-    if (!user || !user.status) {
-      return false;
-    }
-    await this.bot.telegram.sendChatAction(user.user_Id, 'typing');
-    await this.bot.telegram.sendMessage(
-      user.user_Id,
-      'Verification code: ' + OTP,
-    );
-    return true;
   }
 }
