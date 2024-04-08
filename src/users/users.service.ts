@@ -17,13 +17,13 @@ import { FindUserDto } from './dto/find_user.dto';
 import { Op } from 'sequelize';
 import { PhoneUserDto } from '../bot/dto/phone-user.dto';
 import * as otpGenerator from 'otp-generator';
-import { BotService } from '../bot/bot.service';
+import { BotService } from 'src/bot/bot.service';
 import { Otp } from '../otp/model/otp.model';
 import { AddMinutesToDate } from '../helpers/addMinutes';
 import { timestamp } from 'rxjs';
 import { dates, decode, encode } from '../helpers/crypto';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
- 
+
 @Injectable()
 export class UsersService {
   constructor(
@@ -315,7 +315,7 @@ export class UsersService {
   //   const now = new Date();
   //   const expiration_time = AddMinutesToDate(now, 5);
 
-  //   await this.otpRepo.destroy({ 
+  //   await this.otpRepo.destroy({
   //     where: { check: phone_number },
   //   });
 

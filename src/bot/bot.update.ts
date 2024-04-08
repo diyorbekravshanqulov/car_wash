@@ -32,9 +32,7 @@ export class BotUpdate {
   // async onStop(@Ctx() ctx: Context) {
   //   await this.botService.onStop(ctx);
   // }
-
-
-
+  
   @On('message')
   async onMessage(@Ctx() ctx: Context) {
     if ('text' in ctx.message) {

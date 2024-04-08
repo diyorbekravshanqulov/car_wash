@@ -51,12 +51,12 @@ export class BotService {
       const ret = 'return back';
       console.log(this.step);
 
-      async function returnBack(ctx: Context, user: any) {
-        await ctx.reply(
+      function returnBack(ctx: Context, user: any, step: any, step1: any) {
+        ctx.reply(
           `id: ${user.id}
-        Name: ${user.name || 'empty'},
-        Age: ${user.age || 'empty'},
-        Mashena: ${user.car_name || 'empty'}`,
+Name: ${user.name || 'empty'},
+Age: ${user.age || 'empty'},
+Mashena: ${user.car_name || 'empty'}`,
           {
             reply_markup: {
               keyboard: [
@@ -73,7 +73,11 @@ export class BotService {
         await ctx.sendLocation(35.804819, 51.43407, {
           live_period: 86400,
         });
-      } else if (this.step == 0 && ctx.message.text == 'Contact with us 📲') {
+      } else if (ctx.message.text == ret) {
+        this.step1 = --this.step1;
+        this.step = --this.step;
+        returnBack(ctx, this.user, this.step, this.step1);
+      } else if (this.step == 0 && ctx.message.text == 'Registration') {
         this.user.id = ctx.message.from.id;
         this.step++;
         await ctx.reply('Enter your name', {
@@ -83,7 +87,9 @@ export class BotService {
           },
         });
       } else if (ctx.message.text == ret) {
-        await returnBack(ctx, this.user);
+        this.step1 = --this.step1;
+        this.step = --this.step;
+        returnBack(ctx, this.user, this.step, this.step1);
       } else if (this.step == 1 && this.user.id == ctx.message.from.id) {
         this.user.name = ctx.message.text;
         this.step++;
@@ -93,6 +99,10 @@ export class BotService {
             resize_keyboard: true,
           },
         });
+      } else if (ctx.message.text == ret) {
+        this.step1 = --this.step1;
+        this.step = --this.step;
+        returnBack(ctx, this.user, this.step, this.step1);
       } else if (this.step == 2 && this.user.id == ctx.message.from.id) {
         this.user.age = ctx.message.text;
         this.step++;
@@ -102,6 +112,10 @@ export class BotService {
             resize_keyboard: true,
           },
         });
+      } else if (ctx.message.text == ret) {
+        this.step1 = --this.step1;
+        this.step = --this.step;
+        returnBack(ctx, this.user, this.step, this.step1);
       } else if (this.step == 3 && this.user.id == ctx.message.from.id) {
         this.user.car_name = ctx.message.text;
         await ctx.reply(
@@ -110,10 +124,18 @@ export class BotService {
                       Age: ${this.user.age},
                       Mashena: ${this.user.car_name} `,
         );
+      } else if (ctx.message.text == ret) {
+        this.step1 = --this.step1;
+        this.step = --this.step;
+        returnBack(ctx, this.user, this.step, this.step1);
       } else if (ctx.message.text == 'About us') {
         await ctx.reply(
           'Avtomobillarga xizmat ko’rsatish har doim daromadli xizmat ko’rsatish sohalaridan biri bo’lib kelmoqda. Ayniqsa har bir avtomobil egasi o’z mashinasiga o’zi xizmat ko’rsatsa bu ajoyib imkoniyatdan boshqa narsa emas.',
         );
+      } else if (ctx.message.text == ret) {
+        this.step1 = --this.step1;
+        this.step = --this.step;
+        returnBack(ctx, this.user, this.step, this.step1);
       } else if (ctx.message.text == 'Resgistration') {
         await ctx.reply('Mashinagizdi turini aytining', {
           reply_markup: {
@@ -121,6 +143,10 @@ export class BotService {
             resize_keyboard: true,
           },
         });
+      } else if (ctx.message.text == ret) {
+        this.step1 = --this.step1;
+        this.step = --this.step;
+        returnBack(ctx, this.user, this.step, this.step1);
       } else if (this.step1 == 0 && ctx.message.text == 'Yengil mashina') {
         console.log(ctx, 'Yengil mashina');
         this.car.id = ctx.message.from.id;
@@ -131,6 +157,10 @@ export class BotService {
             resize_keyboard: true,
           },
         });
+      } else if (ctx.message.text == ret) {
+        this.step1 = --this.step1;
+        this.step = --this.step;
+        returnBack(ctx, this.user, this.step, this.step1);
       } else if (this.step1 == 1 && this.car.id == ctx.message.from.id) {
         this.car.name = ctx.message.text;
         this.step1++;
@@ -140,14 +170,74 @@ export class BotService {
             resize_keyboard: true,
           },
         });
+      } else if (ctx.message.text == ret) {
+        this.step1 = --this.step1;
+        this.step = --this.step;
+        returnBack(ctx, this.user, this.step, this.step1);
       } else if (this.car.id == ctx.message.from.id) {
         console.log(ctx.message.text);
         this.car.yuvish = ctx.message.text;
         this.step1++;
         await ctx.reply(
-          `id:${this.car.id}
-                      :${this.car.name},
-                      :${this.car.yuvish},
+          `
+Yengi mashina
+id: ${this.car.id}
+Car_name: ${this.car.name},
+Type wash: ${this.car.yuvish},
+                      `,
+        );
+      } else if (ctx.message.text == ret) {
+        this.step1 = --this.step1;
+        this.step = --this.step;
+        returnBack(ctx, this.user, this.step, this.step1);
+      } else if (ctx.message.text == 'Add car') {
+        await ctx.reply('Mashinagizdi turini aytining', {
+          reply_markup: {
+            keyboard: [[{ text: 'Yengil mashina' }, { text: 'Yuk mashinasi' }]],
+            resize_keyboard: true,
+          },
+        });
+      } else if (ctx.message.text == ret) {
+        this.step1 = --this.step1;
+        this.step = --this.step;
+        returnBack(ctx, this.user, this.step, this.step1);
+      } else if (this.step1 == 0 && ctx.message.text == 'Yuk mashinasi') {
+        console.log(ctx, 'Yengil mashina');
+        this.car.id = ctx.message.from.id;
+        this.step1++;
+        await ctx.reply('Mashena name', {
+          reply_markup: {
+            keyboard: [[{ text: ret }]],
+            resize_keyboard: true,
+          },
+        });
+      } else if (ctx.message.text == ret) {
+        this.step1 = --this.step1;
+        this.step = --this.step;
+        returnBack(ctx, this.user, this.step, this.step1);
+      } else if (this.step1 == 1 && this.car.id == ctx.message.from.id) {
+        this.car.name = ctx.message.text;
+        this.step1++;
+        await ctx.reply(`Qanday yuvish kerek`, {
+          reply_markup: {
+            keyboard: [[{ text: ret }]],
+            resize_keyboard: true,
+          },
+        });
+      } else if (ctx.message.text == ret) {
+        this.step1 = --this.step1;
+        this.step = --this.step;
+        returnBack(ctx, this.user, this.step, this.step1);
+      } else if (this.car.id == ctx.message.from.id) {
+        console.log(ctx.message.text);
+        this.car.yuvish = ctx.message.text;
+        this.step1++;
+        await ctx.reply(
+          `
+Yuk Mashinasi
+id: ${this.car.id}
+Car_name: ${this.car.name},
+Type wash: ${this.car.yuvish},
                       `,
         );
       }
