@@ -26,7 +26,7 @@ Array.prototype.odd = function () {
 
 // Example usage
 var numbers = [1, 2, 3, 4, 5];
-
+// -
 console.log(numbers.square()); // Output: [1, 4, 9, 16, 25]
 console.log(numbers.cube()); // Output: [1, 8, 27, 64, 125]
 console.log(numbers.average()); // Output: 3
